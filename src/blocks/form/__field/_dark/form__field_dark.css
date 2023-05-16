@@ -1,0 +1,13 @@
+.form__field_dark {
+  color: #fff;
+  border-bottom: 1px solid #cccccc;
+  background-color: #000;
+}
+
+.form__field::-webkit-input-placeholder {
+  color: #cccccc;
+}
+
+.form__field:-moz-placeholder {
+  color: #cccccc;
+}
