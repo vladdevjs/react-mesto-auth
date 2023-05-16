@@ -33,15 +33,17 @@ function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    Promise.all([api.getUserData(), api.getInitialCards()])
-      .then(([userData, cardData]) => {
-        setCurrentUser(userData);
-        setCards(cardData);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
+    if (loggedIn) {
+      Promise.all([api.getUserData(), api.getInitialCards()])
+        .then(([userData, cardData]) => {
+          setCurrentUser(userData);
+          setCards(cardData);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }, [loggedIn]);
 
   useEffect(() => {
     tokenCheck();
