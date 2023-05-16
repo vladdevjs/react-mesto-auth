@@ -81,7 +81,6 @@ function App() {
       .catch(() => {
         setToolTipStatus('error');
         setInfoTooltipOpen(true);
-        setFormValue({ email: '', password: '' });
       });
   }
 
@@ -103,7 +102,6 @@ function App() {
       .catch(() => {
         setToolTipStatus('error');
         setInfoTooltipOpen(true);
-        setFormValue({ email: '', password: '' });
       });
   }
 
@@ -114,15 +112,27 @@ function App() {
 
   function handleCardLike(card) {
     const isLiked = card.likes.some((i) => i._id === currentUser._id);
-    api.changeLikeCardStatus(card._id, !isLiked).then((newCard) => {
-      setCards((state) => state.map((c) => (c._id === card._id ? newCard : c)));
-    });
+    api
+      .changeLikeCardStatus(card._id, !isLiked)
+      .then((newCard) => {
+        setCards((state) =>
+          state.map((c) => (c._id === card._id ? newCard : c))
+        );
+      })
+      .catch((error) => {
+        console.log(`Ошибка изменения статуса лайка: ${error}`);
+      });
   }
 
   function handleCardDelete(card) {
-    api.deleteCard(card._id).then(() => {
-      setCards((cards) => cards.filter((c) => c._id !== card._id));
-    });
+    api
+      .deleteCard(card._id)
+      .then(() => {
+        setCards((cards) => cards.filter((c) => c._id !== card._id));
+      })
+      .catch((error) => {
+        console.log(`Ошибка удаления карточки: ${error}`);
+      });
   }
 
   function handleEditAvatarClick() {
@@ -180,19 +190,19 @@ function App() {
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
+      <Header
+        // linkAnchor='Выйти'
+        loggedIn={loggedIn}
+        email={email}
+        // route=''
+
+        onSignOut={onSignOut}
+      />
       <Routes>
         <Route
           path='/'
           element={
             <>
-              <Header
-                linkAnchor='Выйти'
-                loggedIn={loggedIn}
-                email={email}
-                route=''
-                logoutClass='header__link_signed-in'
-                onSignOut={onSignOut}
-              />
               <ProtectedRouteElement
                 element={Main}
                 loggedIn={loggedIn}
@@ -212,27 +222,21 @@ function App() {
         <Route
           path='/sign-up'
           element={
-            <>
-              <Header linkAnchor='Войти' route='/sign-in' />
-              <Register
-                onRegister={onRegister}
-                formValue={formValue}
-                onFormChange={changeFormValue}
-              />
-            </>
+            <Register
+              onRegister={onRegister}
+              formValue={formValue}
+              onFormChange={changeFormValue}
+            />
           }
         />
         <Route
           path='/sign-in'
           element={
-            <>
-              <Header linkAnchor='Зарегистрироваться' route='/sign-up' />
-              <Login
-                formValue={formValue}
-                onLogin={onLogin}
-                onFormChange={changeFormValue}
-              />
-            </>
+            <Login
+              formValue={formValue}
+              onLogin={onLogin}
+              onFormChange={changeFormValue}
+            />
           }
         />
         <Route
