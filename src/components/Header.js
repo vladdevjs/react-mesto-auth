@@ -16,7 +16,12 @@ function Header({ loggedIn, email, onSignOut }) {
             isBurgerMenuOpen ? ' burger__menu_opened' : ''
           }`}
         >
-          <Navigation loggedIn={loggedIn} email={email} onSignOut={onSignOut} />
+          <Navigation
+            loggedIn={loggedIn}
+            email={email}
+            onSignOut={onSignOut}
+            handleBurgerMenuOpen={handleBurgerMenuOpen}
+          />
         </nav>
         <div className='header__container'>
           <div className='header__logo'></div>
