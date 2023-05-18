@@ -7,3 +7,10 @@
   font-style: normal;
   line-height: 1.2;
 }
+
+@media screen and (max-width: 650px) {
+  .header__email {
+    margin-right: 0px;
+    margin-bottom: 18px;
+  }
+}
