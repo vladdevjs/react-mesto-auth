@@ -11,3 +11,11 @@
 .form__field:-moz-placeholder {
   color: #cccccc;
 }
+
+.form__field_dark:-webkit-autofill,
+.form__field_dark:-webkit-autofill:hover,
+.form__field_dark:-webkit-autofill:focus,
+.form__field_dark:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #000 inset;
+  -webkit-text-fill-color: #fff;
+}

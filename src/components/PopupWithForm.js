@@ -1,29 +1,42 @@
 import React from 'react';
+import usePopupOverlay from '../utils/usePopupOverlay';
 
-function PopupWithForm(props) {
+function PopupWithForm({
+  children,
+  name,
+  title,
+  isOpen,
+  onClose,
+  onSubmit,
+  buttonName,
+  isValid,
+}) {
+  usePopupOverlay(isOpen, onClose);
+  const formIsValid =
+    isValid && Object.values(isValid).every((value) => value === true);
   return (
-    <div
-      className={`popup popup_type_${props.name} ${
-        props.isOpen ? 'popup_opened' : ''
-      }`}
-    >
+    <div className={`popup popup_type_${name} ${isOpen ? 'popup_opened' : ''}`}>
       <div className='popup__container'>
         <button
           type='button'
           className='popup__close'
           aria-label='Закрыть форму'
-          onClick={props.onClose}
+          onClick={onClose}
         ></button>
-        <h3 className='popup__title'>{props.title}</h3>
+        <h3 className='popup__title'>{title}</h3>
         <form
-          name={props.name}
-          className={`form form_type_${props.name}`}
-          onSubmit={props.onSubmit}
+          name={name}
+          className={`form form_type_${name}`}
+          onSubmit={onSubmit}
           noValidate
         >
-          {props.children}
-          <button type='submit' className='button'>
-            {props.buttonName}
+          {children}
+          <button
+            type='submit'
+            className={`button ${formIsValid ? '' : 'button_disabled'}`}
+            disabled={!formIsValid}
+          >
+            {buttonName}
           </button>
         </form>
       </div>

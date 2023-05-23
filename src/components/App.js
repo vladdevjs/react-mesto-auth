@@ -11,20 +11,27 @@ import AddPlacePopup from './AddPlacePopup';
 import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
 import ImagePopup from './ImagePopup';
+import ConfirmationPopup from './ConfirmationPopup';
 import Register from './Register';
 import Login from './Login';
 import ProtectedRouteElement from './ProtectedRoute';
+import Spin from './Spin';
+import useEscapeKey from '../utils/useEscapeKey';
 
 function App() {
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
+  const [isImagePopupOpen, setIsImagePopupOpen] = useState(false);
+  const [isConfirmationPopupOpen, setIsConfirmationPopupOpen] = useState(false);
   const [isInfoTooltipOpen, setInfoTooltipOpen] = useState(false);
   const [toolTipStatus, setToolTipStatus] = useState('success');
   const [selectedCard, setSelectedCard] = useState(null);
+  const [сardToDelete, setСardToDelete] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(null);
   const [cards, setCards] = useState([]);
-  const [loggedIn, setloggedIn] = useState(false);
+  const [loggedIn, setloggedIn] = useState(null);
   const [email, setEmail] = useState('');
   const [formValue, setFormValue] = useState({
     email: '',
@@ -46,17 +53,6 @@ function App() {
   }, [loggedIn]);
 
   useEffect(() => {
-    tokenCheck();
-  }, []);
-
-  const changeFormValue = (name, value) => {
-    setFormValue({
-      ...formValue,
-      [name]: value,
-    });
-  };
-
-  const tokenCheck = () => {
     if (localStorage.getItem('token')) {
       const jwt = localStorage.getItem('token');
       if (jwt) {
@@ -68,7 +64,16 @@ function App() {
           }
         });
       }
+    } else {
+      setloggedIn(false);
     }
+  }, [navigate]);
+
+  const changeFormValue = (name, value) => {
+    setFormValue({
+      ...formValue,
+      [name]: value,
+    });
   };
 
   function onRegister(email, password) {
@@ -126,11 +131,17 @@ function App() {
       });
   }
 
+  function handleTrashIconCLick(card) {
+    setIsConfirmationPopupOpen(true);
+    setСardToDelete(card);
+  }
+
   function handleCardDelete(card) {
     api
       .deleteCard(card._id)
       .then(() => {
         setCards((cards) => cards.filter((c) => c._id !== card._id));
+        closeAllPopups();
       })
       .catch((error) => {
         console.log(`Ошибка удаления карточки: ${error}`);
@@ -147,17 +158,20 @@ function App() {
     setIsAddPlacePopupOpen(true);
   }
   function handleCardClick(card) {
+    setIsImagePopupOpen(true);
     setSelectedCard(card);
   }
   function closeAllPopups() {
+    setIsImagePopupOpen(false);
     setIsEditProfilePopupOpen(false);
     setIsAddPlacePopupOpen(false);
     setIsEditAvatarPopupOpen(false);
+    setIsConfirmationPopupOpen(false);
     setInfoTooltipOpen(false);
-    setSelectedCard(null);
   }
 
   function handleUpdateUser(newUserInfo) {
+    setIsLoading(true);
     api
       .changeProfileData(newUserInfo)
       .then((updatedUser) => {
@@ -166,9 +180,11 @@ function App() {
       })
       .catch((err) => {
         console.log(err);
-      });
+      })
+      .finally(() => setIsLoading(false));
   }
   function handleUpdateAvatar(newAvatar) {
+    setIsLoading(true);
     api
       .changeAvatar(newAvatar)
       .then((avatar) => {
@@ -177,29 +193,31 @@ function App() {
       })
       .catch((err) => {
         console.log(err);
-      });
+      })
+      .finally(() => setIsLoading(false));
   }
 
   function handleAddCards(newCard) {
+    setIsLoading(true);
     api
       .addCard(newCard)
       .then((newCard) => {
         setCards([newCard, ...cards]);
         closeAllPopups();
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => setIsLoading(false));
+  }
+
+  useEscapeKey(closeAllPopups);
+
+  if (loggedIn === null) {
+    return <Spin />;
   }
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
-      <Header
-        // linkAnchor='Выйти'
-        loggedIn={loggedIn}
-        email={email}
-        // route=''
-
-        onSignOut={onSignOut}
-      />
+      <Header loggedIn={loggedIn} email={email} onSignOut={onSignOut} />
       <Routes>
         <Route
           path='/'
@@ -213,7 +231,7 @@ function App() {
                 onEditAvatar={handleEditAvatarClick}
                 onCardClick={handleCardClick}
                 onCardLike={handleCardLike}
-                onCardDelete={handleCardDelete}
+                onTrashIconClick={handleTrashIconCLick}
                 cards={cards}
               />
               <Footer />
@@ -256,18 +274,31 @@ function App() {
         isOpen={isEditProfilePopupOpen}
         onClose={closeAllPopups}
         onUpdateUser={handleUpdateUser}
+        isLoading={isLoading}
       />
       <AddPlacePopup
         isOpen={isAddPlacePopupOpen}
         onClose={closeAllPopups}
         onAddPlace={handleAddCards}
+        isLoading={isLoading}
       />
       <EditAvatarPopup
         isOpen={isEditAvatarPopupOpen}
         onClose={closeAllPopups}
         onUpdateAvatar={handleUpdateAvatar}
+        isLoading={isLoading}
       />
-      <ImagePopup card={selectedCard} onClose={closeAllPopups} />
+      <ImagePopup
+        isOpen={isImagePopupOpen}
+        card={selectedCard}
+        onClose={closeAllPopups}
+      />
+      <ConfirmationPopup
+        isOpen={isConfirmationPopupOpen}
+        onClose={closeAllPopups}
+        onSubmit={() => handleCardDelete(сardToDelete)}
+      />
+
       <InfoToolTip
         isOpen={isInfoTooltipOpen}
         onClose={closeAllPopups}

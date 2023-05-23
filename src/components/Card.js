@@ -3,7 +3,7 @@ import { useContext } from 'react';
 import placeholder from '../images/placeholder.jpg';
 import { CurrentUserContext } from './../contexts/CurrentUserContext';
 
-function Card({ card, onCardClick, onCardLike, onCardDelete }) {
+function Card({ card, onCardClick, onCardLike, onTrashIconClick }) {
   const currentUser = useContext(CurrentUserContext);
   const isOwn = card.owner._id === currentUser?._id;
   const isLiked = card.likes.some((i) => i._id === currentUser?._id);
@@ -19,8 +19,8 @@ function Card({ card, onCardClick, onCardLike, onCardDelete }) {
     onCardLike(card);
   };
 
-  const handleCardDelete = () => {
-    onCardDelete(card);
+  const handleTrashIconClick = () => {
+    onTrashIconClick(card);
   };
 
   return (
@@ -39,7 +39,7 @@ function Card({ card, onCardClick, onCardLike, onCardDelete }) {
           type='button'
           className='card__delete'
           aria-label='Удалить'
-          onClick={handleCardDelete}
+          onClick={handleTrashIconClick}
         ></button>
       )}
 

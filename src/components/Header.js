@@ -1,13 +1,11 @@
 import Navigation from './Navigation';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 function Header({ loggedIn, email, onSignOut }) {
-  const [isBurgerMenuOpen, setisBurgerMenuOpen] = useState(false);
+  const [isBurgerMenuOpen, setIsBurgerMenuOpen] = useState(false);
 
-  function handleBurgerMenuOpen() {
-    setisBurgerMenuOpen(!isBurgerMenuOpen);
-  }
-
+  const handleBurgerMenuOpen = () => setIsBurgerMenuOpen(!isBurgerMenuOpen);
   return (
     <>
       <header className='header'>
@@ -24,7 +22,11 @@ function Header({ loggedIn, email, onSignOut }) {
           />
         </nav>
         <div className='header__container'>
-          <div className='header__logo'></div>
+          {loggedIn ? (
+            <Link to='/' className='header__logo'></Link>
+          ) : (
+            <Link to='/sign-in' className='header__logo'></Link>
+          )}
           <nav className='header__info'>
             <Navigation
               loggedIn={loggedIn}

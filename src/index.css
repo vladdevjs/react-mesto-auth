@@ -68,3 +68,4 @@
 @import url(./blocks/burger/__menu/burger__menu.css);
 @import url(./blocks/burger/__menu/_opened/burger__menu_opened.css);
 @import url(./blocks/burger/_close/burger_close.css);
+@import url(./blocks/spinner/spinner.css);

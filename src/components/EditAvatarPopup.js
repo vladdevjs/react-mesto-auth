@@ -1,13 +1,21 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import PopupWithForm from './PopupWithForm';
 
-function EditAvatarPopup({ isOpen, onClose, onUpdateAvatar }) {
+function EditAvatarPopup({ isOpen, onClose, onUpdateAvatar, isLoading }) {
   const avatarRef = useRef(null);
+  const errorRef = useRef(null);
+  const [isValid, setIsValid] = useState({ avatar: false });
 
   useEffect(() => {
-    if (!isOpen) {
-      handleReset();
+    const avatarNode = avatarRef.current;
+    if (isOpen) {
+      avatarNode.value = '';
+      errorRef.current.textContent = '';
+      avatarNode?.addEventListener('input', handleChangeInput);
     }
+    return () => {
+      avatarNode?.removeEventListener('input', handleChangeInput);
+    };
   }, [isOpen]);
 
   function handleSubmit(e) {
@@ -17,8 +25,9 @@ function EditAvatarPopup({ isOpen, onClose, onUpdateAvatar }) {
     });
   }
 
-  function handleReset() {
-    avatarRef.current.value = '';
+  function handleChangeInput() {
+    errorRef.current.textContent = avatarRef.current.validationMessage;
+    setIsValid({ avatar: avatarRef.current.validity.valid });
   }
 
   return (
@@ -28,10 +37,10 @@ function EditAvatarPopup({ isOpen, onClose, onUpdateAvatar }) {
       isOpen={isOpen}
       onClose={() => {
         onClose();
-        handleReset();
       }}
       onSubmit={handleSubmit}
-      buttonName='Сохранить'
+      buttonName={isLoading ? 'Сохранение...' : 'Сохранить'}
+      isValid={isValid}
     >
       <fieldset className='form__fieldset'>
         <input
@@ -43,7 +52,10 @@ function EditAvatarPopup({ isOpen, onClose, onUpdateAvatar }) {
           ref={avatarRef}
           required
         />
-        <span className='avatar-field-error form__field-error'></span>
+        <span
+          ref={errorRef}
+          className='avatar-field-error form__field-error'
+        ></span>
       </fieldset>
     </PopupWithForm>
   );

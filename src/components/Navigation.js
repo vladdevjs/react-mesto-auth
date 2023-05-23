@@ -12,7 +12,9 @@ function Navigation({ loggedIn, email, onSignOut, handleBurgerMenuOpen }) {
           className='header__link header__link_signed-in'
           onClick={() => {
             onSignOut();
-            handleBurgerMenuOpen();
+            if (handleBurgerMenuOpen) {
+              handleBurgerMenuOpen();
+            }
           }}
         >
           Выйти

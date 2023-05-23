@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import PopupWithForm from './PopupWithForm';
 
-function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
+function AddPlacePopup({ isOpen, onClose, onAddPlace, isLoading }) {
   const [name, setName] = useState('');
   const [link, setLink] = useState('');
+  const [errorMessage, setErrorMessage] = useState({});
+  const [isValid, setIsValid] = useState({ name: false, link: false });
 
   useEffect(() => {
     if (!isOpen) {
@@ -13,15 +15,32 @@ function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
 
   function handleNameChange(e) {
     setName(e.target.value);
+    setErrorMessage({
+      ...errorMessage,
+      name: e.target.validationMessage,
+    });
+    setIsValid({
+      ...isValid,
+      name: e.target.validity.valid,
+    });
   }
 
   function handleLinkChange(e) {
     setLink(e.target.value);
+    setErrorMessage({
+      ...errorMessage,
+      link: e.target.validationMessage,
+    });
+    setIsValid({
+      ...isValid,
+      link: e.target.validity.valid,
+    });
   }
 
   function handleReset() {
     setName('');
     setLink('');
+    setErrorMessage({});
   }
   function handleSubmit(e) {
     e.preventDefault();
@@ -39,8 +58,9 @@ function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
         onClose();
         handleReset();
       }}
-      buttonName='Создать'
+      buttonName={isLoading ? 'Создание...' : 'Создать'}
       onSubmit={handleSubmit}
+      isValid={isValid}
     >
       <fieldset className='form__fieldset'>
         <input
@@ -55,7 +75,9 @@ function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
           onChange={handleNameChange}
           required
         />
-        <span className='place-field-error form__field-error'></span>
+        <span className='place-field-error form__field-error'>
+          {errorMessage.name}
+        </span>
         <input
           type='url'
           name='image'
@@ -66,7 +88,9 @@ function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
           onChange={handleLinkChange}
           required
         />
-        <span className='image-field-error form__field-error'></span>
+        <span className='image-field-error form__field-error'>
+          {errorMessage.link}
+        </span>
       </fieldset>
     </PopupWithForm>
   );

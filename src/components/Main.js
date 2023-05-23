@@ -4,6 +4,15 @@ import Card from './Card';
 import placeholder from '../images/placeholder.jpg';
 
 function Main(props) {
+  const {
+    onEditProfile,
+    onAddPlace,
+    onEditAvatar,
+    onCardClick,
+    onCardLike,
+    onTrashIconClick,
+    cards,
+  } = props;
   const currentUser = useContext(CurrentUserContext);
 
   return (
@@ -24,7 +33,7 @@ function Main(props) {
               type='button'
               className='profile__avatar-change'
               aria-label='Изменить аватар'
-              onClick={props.onEditAvatar}
+              onClick={onEditAvatar}
             ></button>
           </div>
           <div className='profile__info'>
@@ -33,7 +42,7 @@ function Main(props) {
               type='button'
               className='profile__edit'
               aria-label='Редактировать профиль'
-              onClick={props.onEditProfile}
+              onClick={onEditProfile}
             ></button>
             <p className='profile__description text-fit'>
               {currentUser?.about}
@@ -44,18 +53,18 @@ function Main(props) {
           type='button'
           className='profile__add-card'
           aria-label='Добавить карточку'
-          onClick={props.onAddPlace}
+          onClick={onAddPlace}
         ></button>
       </section>
       <section className='cards' aria-label='Карточки различных мест'>
         <ul className='cards__list'>
-          {props.cards.map((card) => (
+          {cards.map((card) => (
             <Card
               key={card._id}
               card={card}
-              onCardClick={props.onCardClick}
-              onCardLike={props.onCardLike}
-              onCardDelete={props.onCardDelete}
+              onCardClick={onCardClick}
+              onCardLike={onCardLike}
+              onTrashIconClick={onTrashIconClick}
             />
           ))}
         </ul>
